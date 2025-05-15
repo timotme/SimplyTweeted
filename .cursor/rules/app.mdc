@@ -1,0 +1,6 @@
+---
+description: 
+globs: app/simply-tweeted-app/*
+alwaysApply: false
+---
+- Use DaisyUI as much as possible
