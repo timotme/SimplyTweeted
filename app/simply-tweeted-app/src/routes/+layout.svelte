@@ -1,6 +1,7 @@
 <script lang="ts">
 	import '../app.css';
 	import { page } from '$app/stores';
+	import { signOut } from '@auth/sveltekit/client';
 
 	let { children } = $props();
 </script>
@@ -21,7 +22,7 @@
 					</div>
 					<ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
 						<li><a href="/profile">Profile</a></li>
-						<li><a href="/api/auth/signout">Sign out</a></li>
+						<li><button on:click={() => signOut()} class="w-full text-left">Sign out</button></li>
 					</ul>
 				</div>
 			{:else}

@@ -1,13 +1,18 @@
 <script lang="ts">
-       import { SignIn } from "@auth/sveltekit/components"
+	import { signIn } from '@auth/sveltekit/client';
 </script>
 
-<div class="hero min-h-screen bg-base-200">
+<div class="hero bg-base-200 min-h-screen">
 	<div class="hero-content text-center">
 		<div class="max-w-md">
-			<h1 class="text-5xl font-bold mb-6">Simply Tweeted</h1>
+			<h1 class="mb-6 text-5xl font-bold">Simply Tweeted</h1>
 			<p class="py-6">Schedule your tweets with ease. Login to get started.</p>
-			<SignIn provider="twitter" signInPage="signin" />
+			<div>
+				<img src="/img/logo.svg" alt="Company Logo" />
+				<button on:click={() => signIn('twitter')} class="btn btn-primary"
+					>Sign in with Twitter</button
+				>
+			</div>
 		</div>
 	</div>
-</div> 
+</div>
