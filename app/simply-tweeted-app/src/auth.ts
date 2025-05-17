@@ -23,29 +23,29 @@ export const { handle, signIn, signOut } = SvelteKitAuth({
       // Deny other providers by default
       return false;
     },
-    async jwt({ token, account, profile }) {
-      // Persist the user id to the token right after signin
-      if (account && profile && 'data' in profile) {
-        // It's important to check the provider here if you have multiple.
-        if (account.provider === 'twitter') {
-          const twitterProfile = profile.data as { id: string; username: string };
-          token.userId = twitterProfile.id; // Store the stable Twitter ID
-          token.twitterUsername = twitterProfile.username; // Optionally store username
-        }
-      }
-      return token;
-    },
-    async session({ session, token, user }) {
-      // Send properties to the client, like user id from a provider.
-      if (session.user) {
-        if (token.userId) {
-          (session.user as { id: string }).id = token.userId as string;
-        }
-        if (token.twitterUsername) {
-          (session.user as { username?: string }).username = token.twitterUsername as string;
-        }
-      }
-      return session;
-    }
+    // async jwt({ token, account, profile }) {
+    //   // Persist the user id to the token right after signin
+    //   if (account && profile && 'data' in profile) {
+    //     // It's important to check the provider here if you have multiple.
+    //     if (account.provider === 'twitter') {
+    //       const twitterProfile = profile.data as { id: string; username: string };
+    //       token.userId = twitterProfile.id; // Store the stable Twitter ID
+    //       token.twitterUsername = twitterProfile.username; // Optionally store username
+    //     }
+    //   }
+    //   return token;
+    // },
+    // async session({ session, token, user }) {
+    //   // Send properties to the client, like user id from a provider.
+    //   if (session.user) {
+    //     if (token.userId) {
+    //       (session.user as { id: string }).id = token.userId as string;
+    //     }
+    //     if (token.twitterUsername) {
+    //       (session.user as { username?: string }).username = token.twitterUsername as string;
+    //     }
+    //   }
+    //   return session;
+    // }
   }
 }) 
