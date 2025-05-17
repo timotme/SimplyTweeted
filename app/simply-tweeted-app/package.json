@@ -29,6 +29,9 @@
 	},
 	"dependencies": {
 		"@auth/sveltekit": "^1.9.2",
-		"daisyui": "^5.0.35"
+		"@types/node": "^22.15.18",
+		"daisyui": "^5.0.35",
+		"emoji-picker-element": "^1.26.3",
+		"mongodb": "^6.16.0"
 	}
 }
