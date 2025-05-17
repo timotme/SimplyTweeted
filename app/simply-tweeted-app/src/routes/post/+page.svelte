@@ -2,9 +2,6 @@
 	import { enhance } from '$app/forms';
 	import { onMount, onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
-	import { goto, invalidateAll } from '$app/navigation';
-
-	export let form;
 
 	let tweetContent = '';
 	let scheduledDate = new Date().toISOString().split('T')[0]; // Today's date as default
