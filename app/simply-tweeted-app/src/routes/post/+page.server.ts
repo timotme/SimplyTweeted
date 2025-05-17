@@ -1,7 +1,7 @@
 import { redirect, fail } from '@sveltejs/kit';
 import type { Actions, RequestEvent } from '@sveltejs/kit';
 import { dbClient } from '$lib/db';
-import type { Tweet } from '$lib/types';
+import { TweetStatus, type Tweet } from '$lib/types';
 
 export const load = async (event: RequestEvent) => {
 	const session = await event.locals.auth();
@@ -57,7 +57,7 @@ export const actions: Actions = {
 				content,
 				scheduledDate: scheduledDateTime,
 				community,
-				status: 'scheduled',
+				status: TweetStatus.SCHEDULED,
 				createdAt: new Date()
 			};
 			

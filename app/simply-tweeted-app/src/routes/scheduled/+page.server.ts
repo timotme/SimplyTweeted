@@ -1,6 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { dbClient } from '$lib/db';
+import { TweetStatus } from '$lib/types';
 
 const TWEETS_PER_PAGE = 10;
 
@@ -14,10 +15,10 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	const page = parseInt(url.searchParams.get('page') || '1');
 
 	try {
-		// Use the utility functions from dbClient for cleaner code
+		// Use the generic utility functions from dbClient for cleaner code
 		const [tweets, totalTweets] = await Promise.all([
-			dbClient.getScheduledTweets(userId, page, TWEETS_PER_PAGE),
-			dbClient.countScheduledTweets(userId)
+			dbClient.getTweets(userId, page, TWEETS_PER_PAGE, TweetStatus.SCHEDULED, 1),
+			dbClient.countTweets(userId, TweetStatus.SCHEDULED)
 		]);
 
 		return {
