@@ -1,7 +1,8 @@
 import { MongoClient, ObjectId } from 'mongodb';
-import type { Tweet } from './types';
+import type { Tweet, UserAccount } from './types';
 import { TweetStatus } from './types';
 import { MONGODB_URI } from '$env/static/private';
+import { encrypt, decrypt } from './encryption';
 
 const DB_NAME = 'simplyTweeted';
 
@@ -129,6 +130,80 @@ class DatabaseClient {
       this.connected = false;
       console.log('Disconnected from MongoDB');
     }
+  }
+
+  // Create or update a user account
+  async saveUserAccount(userAccount: UserAccount): Promise<string> {
+    const db = await this.connect();
+    
+    // Encrypt sensitive data
+    const encryptedAccount = {
+      ...userAccount,
+      access_token: encrypt(userAccount.access_token),
+      refresh_token: encrypt(userAccount.refresh_token),
+      updatedAt: new Date()
+    };
+    
+    // Check if user account already exists
+    const existingAccount = await db.collection('accounts').findOne({
+      userId: userAccount.userId,
+      provider: userAccount.provider
+    });
+    
+    if (existingAccount) {
+      // Update existing account
+      await db.collection('accounts').updateOne(
+        { _id: existingAccount._id },
+        { $set: encryptedAccount }
+      );
+      return existingAccount._id.toString();
+    } else {
+      // Insert new account with creation time
+      const result = await db.collection('accounts').insertOne({
+        ...encryptedAccount,
+        createdAt: new Date()
+      });
+      return result.insertedId.toString();
+    }
+  }
+
+  // Get user account with decrypted tokens
+  async getUserAccount(userId: string, provider: string): Promise<UserAccount | null> {
+    const db = await this.connect();
+    
+    const account = await db.collection('accounts').findOne({
+      userId,
+      provider
+    });
+    
+    if (!account) return null;
+    
+    // Decrypt sensitive data and remove MongoDB _id
+    const { _id, ...accountData } = account;
+    return {
+      ...accountData,
+      access_token: decrypt(account.access_token),
+      refresh_token: decrypt(account.refresh_token)
+    } as UserAccount;
+  }
+
+  // Get all user accounts for a user
+  async getUserAccounts(userId: string): Promise<UserAccount[]> {
+    const db = await this.connect();
+    
+    const accounts = await db.collection('accounts').find({
+      userId
+    }).toArray();
+    
+    // Decrypt sensitive data for all accounts
+    return accounts.map(account => {
+      const { _id, ...accountData } = account;
+      return {
+        ...accountData,
+        access_token: decrypt(account.access_token),
+        refresh_token: decrypt(account.refresh_token)
+      } as UserAccount;
+    });
   }
 }
 

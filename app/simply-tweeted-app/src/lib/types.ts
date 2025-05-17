@@ -4,6 +4,21 @@ export enum TweetStatus {
   FAILED = 'failed'
 }
 
+export interface UserAccount {
+  userId: string;
+  username: string;
+  provider: string;
+  providerAccountId: string;
+  access_token: string;
+  refresh_token: string;
+  expires_at: number;
+  expires_in: number;
+  token_type: string;
+  scope: string;
+  createdAt: Date;
+  updatedAt?: Date;
+}
+
 export interface Tweet {
   id?: string;
   userId: string;
