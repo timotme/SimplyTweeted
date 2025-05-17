@@ -50,6 +50,7 @@ export const actions: Actions = {
 			return fail(400, { content, error: 'Scheduled time must be in the future' });
 		}
 		
+		let success = false;
 		try {
 			const tweet: Tweet = {
 				userId: session.user.id as string,
@@ -61,11 +62,12 @@ export const actions: Actions = {
 			};
 			
 			await dbClient.saveTweet(tweet);
-			
-			throw redirect(303, '/dashboard');
+			success = true;
 		} catch (error) {
 			console.error('Failed to save tweet:', error);
 			return fail(500, { content, error: 'Failed to schedule tweet. Please try again.' });
 		}
+
+		redirect(303, '/dashboard');
 	}
 }; 

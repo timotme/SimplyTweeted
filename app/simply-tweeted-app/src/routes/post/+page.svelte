@@ -2,13 +2,14 @@
 	import { enhance } from '$app/forms';
 	import { onMount, onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
+	import { goto, invalidateAll } from '$app/navigation';
 
 	export let form;
 
 	let tweetContent = '';
 	let scheduledDate = new Date().toISOString().split('T')[0]; // Today's date as default
-	let scheduledTime = '12:00'; // Default time
-	let community = 'build in public';
+	let scheduledTime = new Date(Math.ceil((Date.now() + 15 * 60000) / (5 * 60000)) * 5 * 60000).toTimeString().slice(0, 5); // Default time is 15 minutes from now, rounded to next 5min
+	let community = '';
 	let charCount = 0;
 	let isDateTimeValid = true;
 	let showEmojiPicker = false;
@@ -128,6 +129,7 @@
 						<span class="label-text">Community</span>
 					</label>
 					<select id="community" name="community" bind:value={community} class="select select-bordered w-full">
+						<option value="">None</option>
 						<option value="build in public">Build in Public</option>
 					</select>
 				</div>
