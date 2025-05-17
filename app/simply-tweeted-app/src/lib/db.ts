@@ -1,7 +1,7 @@
 import { MongoClient } from 'mongodb';
 import type { Tweet } from './types';
+import { MONGODB_URI } from '$env/static/private';
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017';
 const DB_NAME = 'simplyTweeted';
 
 class DatabaseClient {
