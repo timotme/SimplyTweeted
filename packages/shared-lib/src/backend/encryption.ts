@@ -1,4 +1,3 @@
-import { AUTH_SECRET } from '$env/static/private';
 import crypto from 'crypto';
 
 // Use AES-256-GCM for encryption (more secure than CBC)
@@ -7,10 +6,23 @@ const KEY_LENGTH = 32; // 256 bits
 const IV_LENGTH = 12; // 12 bytes is recommended for GCM
 const AUTH_TAG_LENGTH = 16; // 16 bytes for GCM auth tag
 
+let authSecret: string;
+
+// Initialize AUTH_SECRET for the encryption module
+export function initEncryption(secret: string) {
+  if (!secret) {
+    throw new Error("AUTH_SECRET is required for encryption module initialization");
+  }
+  authSecret = secret;
+}
+
 // Create a key from AUTH_SECRET
 function getEncryptionKey(): Buffer {
+  if (!authSecret) {
+    throw new Error("Encryption module not initialized. Call initEncryption(secret) first.");
+  }
   // Create a key that's exactly KEY_LENGTH bytes by hashing the AUTH_SECRET
-  return crypto.createHash('sha256').update(AUTH_SECRET).digest().slice(0, KEY_LENGTH);
+  return crypto.createHash('sha256').update(authSecret).digest().slice(0, KEY_LENGTH);
 }
 
 /**

@@ -1,7 +1,6 @@
 import { error, fail, redirect } from '@sveltejs/kit';
-import type { PageServerLoad, Actions } from './$types';
-import { dbClient } from '$lib/db';
-import { TweetStatus } from '$lib/types';
+import { dbClient } from '$lib/server/db';
+import { TweetStatus } from 'shared-lib';
 
 const TWEETS_PER_PAGE = 10;
 

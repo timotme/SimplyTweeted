@@ -1,8 +1,7 @@
 import { MongoClient, ObjectId } from 'mongodb';
-import type { Tweet, UserAccount } from './types';
-import { TweetStatus } from './types';
-import { MONGODB_URI } from '$env/static/private';
-import { encrypt, decrypt } from './encryption';
+import type { Tweet, UserAccount } from '../types/types'; // Updated path
+import { TweetStatus } from '../types/types'; // Updated path
+import { encrypt, decrypt } from './encryption'; // Updated path (assuming encryption.ts is also in backend)
 
 const DB_NAME = 'simplyTweeted';
 
@@ -10,14 +9,19 @@ class DatabaseClient {
   private static instance: DatabaseClient;
   private client: MongoClient;
   private connected = false;
+  private mongoDbUri: string;
 
-  private constructor() {
-    this.client = new MongoClient(MONGODB_URI);
+  private constructor(mongoDbUri: string) {
+    this.mongoDbUri = mongoDbUri;
+    this.client = new MongoClient(this.mongoDbUri);
   }
 
-  public static getInstance(): DatabaseClient {
+  public static getInstance(mongoDbUri?: string): DatabaseClient {
     if (!DatabaseClient.instance) {
-      DatabaseClient.instance = new DatabaseClient();
+      if (!mongoDbUri) {
+        throw new Error("MongoDB URI is required for the first instantiation of DatabaseClient");
+      }
+      DatabaseClient.instance = new DatabaseClient(mongoDbUri);
     }
     return DatabaseClient.instance;
   }
@@ -207,4 +211,11 @@ class DatabaseClient {
   }
 }
 
-export const dbClient = DatabaseClient.getInstance(); 
+// Updated: dbClient now needs to be initialized with MONGODB_URI
+// export const dbClient = DatabaseClient.getInstance(); 
+// You will need to initialize it like this in your app/scheduler:
+// import { MONGODB_URI } from '$env/static/private'; // Or process.env.MONGODB_URI for scheduler
+// import { DatabaseClient } from 'shared-lib'; 
+// export const dbClient = DatabaseClient.getInstance(MONGODB_URI);
+
+export { DatabaseClient }; // Export the class itself 

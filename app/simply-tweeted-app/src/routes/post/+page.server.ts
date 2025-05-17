@@ -1,7 +1,7 @@
 import { redirect, fail } from '@sveltejs/kit';
 import type { Actions, RequestEvent } from '@sveltejs/kit';
-import { dbClient } from '$lib/db';
-import { TweetStatus, type Tweet } from '$lib/types';
+import { dbClient } from '$lib/server/db';
+import { TweetStatus, type Tweet } from 'shared-lib';
 
 export const load = async (event: RequestEvent) => {
 	const session = await event.locals.auth();

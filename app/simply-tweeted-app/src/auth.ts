@@ -1,8 +1,8 @@
 import { SvelteKitAuth } from "@auth/sveltekit"
 import Twitter from "@auth/sveltekit/providers/twitter"
 import { ALLOWED_TWITTER_ACCOUNTS } from "$env/static/private";
-import { dbClient } from "$lib/db";
-import type { UserAccount } from "$lib/types";
+import { dbClient } from '$lib/server/db';
+import type { UserAccount } from 'shared-lib';
  
 // List of allowed Twitter account usernames/IDs
 const allowedAccounts = ALLOWED_TWITTER_ACCOUNTS.split(',').map(account => account.trim());

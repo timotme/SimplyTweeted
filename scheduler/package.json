@@ -1,0 +1,11 @@
+{
+  "name": "tweet-poster-service",
+  "version": "1.0.0",
+  "description": "Run periodically to post the scheduled tweets to X ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "timot_me",
+  "license": "GPL-3.0-or-later"
+}
