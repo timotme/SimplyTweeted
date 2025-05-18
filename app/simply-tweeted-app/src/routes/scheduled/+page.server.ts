@@ -1,7 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { dbClient } from '$lib/db';
-import { TweetStatus } from '$lib/types';
+import { dbClient } from '$lib/server/db';
+import { TweetStatus } from 'shared-lib';
 
 const TWEETS_PER_PAGE = 10;
 
@@ -35,7 +35,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
 export const actions: Actions = {
 	deleteTweet: async ({ request, locals }) => {
-		const session = await locals.getSession();
+		const session = await locals.auth();
 		if (!session?.user?.id) {
 			return fail(401, { error: 'Unauthorized' });
 		}

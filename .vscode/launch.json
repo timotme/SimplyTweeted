@@ -3,10 +3,17 @@
 	"configurations": [
 		{
 			"command": "npm run dev",
-			"name": "Run development server",
+			"name": "Run development server (app)",
 			"request": "launch",
 			"type": "node-terminal",
 			"cwd": "${workspaceFolder}/app/simply-tweeted-app"
+		},
+		{
+			"command": "npm run dev:debug",
+			"name": "Debug scheduler service",
+			"request": "launch",
+			"type": "node-terminal",
+			"cwd": "${workspaceFolder}/scheduler"
 		}
 	]
 }

@@ -1,8 +1,7 @@
 import { MongoClient, ObjectId } from 'mongodb';
-import type { Tweet, UserAccount } from './types';
-import { TweetStatus } from './types';
-import { MONGODB_URI } from '$env/static/private';
-import { encrypt, decrypt } from './encryption';
+import type { Tweet, UserAccount } from '../types/types'; 
+import { TweetStatus } from '../types/types'; 
+import { EncryptionService } from './encryption';
 
 const DB_NAME = 'simplyTweeted';
 
@@ -10,14 +9,27 @@ class DatabaseClient {
   private static instance: DatabaseClient;
   private client: MongoClient;
   private connected = false;
+  private mongoDbUri: string;
+  private encryptionService: EncryptionService;
 
-  private constructor() {
-    this.client = new MongoClient(MONGODB_URI);
+  private constructor(mongoDbUri: string, authSecret: string) {
+    this.mongoDbUri = mongoDbUri;
+    this.client = new MongoClient(this.mongoDbUri);
+    if (!authSecret) {
+        throw new Error("Auth Secret is required for DatabaseClient initialization");
+    }
+    this.encryptionService = new EncryptionService(authSecret);
   }
 
-  public static getInstance(): DatabaseClient {
+  public static getInstance(mongoDbUri?: string, authSecret?: string): DatabaseClient {
     if (!DatabaseClient.instance) {
-      DatabaseClient.instance = new DatabaseClient();
+      if (!mongoDbUri) {
+        throw new Error("MongoDB URI is required for the first instantiation of DatabaseClient");
+      }
+      if (!authSecret) {
+        throw new Error("Auth Secret is required for the first instantiation of DatabaseClient");
+      }
+      DatabaseClient.instance = new DatabaseClient(mongoDbUri, authSecret);
     }
     return DatabaseClient.instance;
   }
@@ -139,8 +151,8 @@ class DatabaseClient {
     // Encrypt sensitive data
     const encryptedAccount = {
       ...userAccount,
-      access_token: encrypt(userAccount.access_token),
-      refresh_token: encrypt(userAccount.refresh_token),
+      access_token: this.encryptionService.encrypt(userAccount.access_token),
+      refresh_token: this.encryptionService.encrypt(userAccount.refresh_token),
       updatedAt: new Date()
     };
     
@@ -182,8 +194,8 @@ class DatabaseClient {
     const { _id, ...accountData } = account;
     return {
       ...accountData,
-      access_token: decrypt(account.access_token),
-      refresh_token: decrypt(account.refresh_token)
+      access_token: this.encryptionService.decrypt(account.access_token),
+      refresh_token: this.encryptionService.decrypt(account.refresh_token)
     } as UserAccount;
   }
 
@@ -200,11 +212,47 @@ class DatabaseClient {
       const { _id, ...accountData } = account;
       return {
         ...accountData,
-        access_token: decrypt(account.access_token),
-        refresh_token: decrypt(account.refresh_token)
+        access_token: this.encryptionService.decrypt(account.access_token),
+        refresh_token: this.encryptionService.decrypt(account.refresh_token)
       } as UserAccount;
     });
   }
+
+  // Find all tweets that are scheduled and due to be posted
+  async findDueTweets(): Promise<Tweet[]> {
+    const db = await this.connect();
+    const now = new Date();
+    
+    const tweets = await db.collection('tweets').find({
+      status: TweetStatus.SCHEDULED,
+      scheduledDate: { $lte: now }
+    }).toArray();
+    
+    return tweets.map(tweet => ({
+      id: tweet._id.toString(),
+      userId: tweet.userId,
+      content: tweet.content,
+      scheduledDate: new Date(tweet.scheduledDate),
+      community: tweet.community,
+      status: tweet.status,
+      createdAt: new Date(tweet.createdAt),
+      updatedAt: tweet.updatedAt ? new Date(tweet.updatedAt) : undefined
+    }));
+  }
+
+  // Update the status of a tweet
+  async updateTweetStatus(tweetId: string, status: TweetStatus): Promise<void> {
+    const db = await this.connect();
+    await db.collection('tweets').updateOne(
+      { _id: new ObjectId(tweetId) },
+      { 
+        $set: { 
+          status,
+          updatedAt: new Date()
+        } 
+      }
+    );
+  }
 }
 
-export const dbClient = DatabaseClient.getInstance(); 
+export { DatabaseClient };

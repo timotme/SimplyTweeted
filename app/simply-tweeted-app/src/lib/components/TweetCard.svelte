@@ -1,17 +1,27 @@
+<script context="module" lang="ts">
+  // Define TweetStatus as a const object for Svelte compatibility
+
+</script>
+
 <script lang="ts">
-  import type { Tweet } from '$lib/types';
-  import { TweetStatus } from '$lib/types';
-  
+	import { TweetStatus, type Tweet } from "shared-lib";
+
   export let tweet: Tweet;
   export let onDelete: (id: string) => void = () => {};
   export let showDeleteButton: boolean = true;
   
   function formatDate(dateString: string | Date): string {
-    const date = new Date(dateString);
-    return date.toLocaleString('en-US', { 
-      year: 'numeric', month: 'long', day: 'numeric', 
-      hour: '2-digit', minute: '2-digit', hour12: true 
-    });
+
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleString('en-US', { 
+        year: 'numeric', month: 'long', day: 'numeric', 
+        hour: '2-digit', minute: '2-digit', hour12: true 
+      });
+    } catch (error) {
+      console.error('TweetCard formatDate error:', error, 'for input:', dateString);
+      return 'Invalid date (error)';
+    }
   }
 
   function handleDelete() {

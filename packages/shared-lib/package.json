@@ -1,0 +1,32 @@
+{
+  "name": "shared-lib",
+  "version": "1.0.0",
+  "description": "Shared library for SimplyTweeted app and scheduler",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./backend": {
+      "import": "./dist/backend/index.js",
+      "types": "./dist/backend/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "rm -rf dist/ & tsc",
+    "dev": "tsc -w"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "mongodb": "^5.0.0" 
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0" 
+  }
+} 

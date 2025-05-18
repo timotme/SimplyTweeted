@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { PageData, ActionData } from './$types';
-	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
 	import TweetCard from '$lib/components/TweetCard.svelte';
 	import Pagination from '$lib/components/Pagination.svelte';
@@ -31,7 +30,7 @@
 		})
 		.then(response => response.json())
 		.then(result => {
-			if (result.success) {
+			if (result.status === 200) {
 				invalidateAll();
 				alert('Tweet deleted successfully!');
 			} else {

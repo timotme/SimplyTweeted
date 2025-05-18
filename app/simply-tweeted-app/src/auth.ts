@@ -1,14 +1,25 @@
 import { SvelteKitAuth } from "@auth/sveltekit"
 import Twitter from "@auth/sveltekit/providers/twitter"
-import { ALLOWED_TWITTER_ACCOUNTS } from "$env/static/private";
-import { dbClient } from "$lib/db";
-import type { UserAccount } from "$lib/types";
+import { ALLOWED_TWITTER_ACCOUNTS, AUTH_TWITTER_ID, AUTH_TWITTER_SECRET } from "$env/static/private";
+import { dbClient } from '$lib/server/db';
+import type { UserAccount } from 'shared-lib';
  
 // List of allowed Twitter account usernames/IDs
 const allowedAccounts = ALLOWED_TWITTER_ACCOUNTS.split(',').map(account => account.trim());
 
 export const { handle, signIn, signOut } = SvelteKitAuth({
-  providers: [Twitter],
+  providers: [
+    Twitter({
+      clientId: AUTH_TWITTER_ID,
+      clientSecret: AUTH_TWITTER_SECRET,
+      authorization: {
+        url: "https://x.com/i/oauth2/authorize",
+        params: { 
+          scope: "tweet.read tweet.write users.read offline.access" 
+        }
+      }
+    })
+  ],
   callbacks: {
     async signIn({ account, profile }) {
       if (account?.provider === 'twitter') {

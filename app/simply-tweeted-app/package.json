@@ -32,6 +32,9 @@
 		"@types/node": "^22.15.18",
 		"daisyui": "^5.0.35",
 		"emoji-picker-element": "^1.26.3",
-		"mongodb": "^6.16.0"
+		"install": "^0.13.0",
+		"mongodb": "^6.16.0",
+		"npm": "^11.4.0",
+		"shared-lib": "file:../../packages/shared-lib"
 	}
 }
