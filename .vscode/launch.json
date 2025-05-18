@@ -7,6 +7,19 @@
 			"request": "launch",
 			"type": "node-terminal",
 			"cwd": "${workspaceFolder}/app/simply-tweeted-app"
+		},
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "Debug Scheduler (TypeScript)",
+			"runtimeArgs": ["-r", "ts-node/register"],
+			"args": ["${workspaceFolder}/scheduler/src/index.ts"],
+			"cwd": "${workspaceFolder}/scheduler",
+			"protocol": "inspector",
+			"internalConsoleOptions": "openOnSessionStart",
+			"skipFiles": [
+				"<node_internals>/**"
+			]
 		}
 	]
 }

@@ -1,7 +1,7 @@
 import { MongoClient, ObjectId } from 'mongodb';
-import type { Tweet, UserAccount } from '../types/types'; // Updated path
-import { TweetStatus } from '../types/types'; // Updated path
-import { encrypt, decrypt } from './encryption'; // Updated path (assuming encryption.ts is also in backend)
+import type { Tweet, UserAccount } from '../types/types'; 
+import { TweetStatus } from '../types/types'; 
+import { encrypt, decrypt } from './encryption';
 
 const DB_NAME = 'simplyTweeted';
 
@@ -209,13 +209,42 @@ class DatabaseClient {
       } as UserAccount;
     });
   }
+
+  // Find all tweets that are scheduled and due to be posted
+  async findDueTweets(): Promise<Tweet[]> {
+    const db = await this.connect();
+    const now = new Date();
+    
+    const tweets = await db.collection('tweets').find({
+      status: TweetStatus.SCHEDULED,
+      scheduledDate: { $lte: now }
+    }).toArray();
+    
+    return tweets.map(tweet => ({
+      id: tweet._id.toString(),
+      userId: tweet.userId,
+      content: tweet.content,
+      scheduledDate: new Date(tweet.scheduledDate),
+      community: tweet.community,
+      status: tweet.status,
+      createdAt: new Date(tweet.createdAt),
+      updatedAt: tweet.updatedAt ? new Date(tweet.updatedAt) : undefined
+    }));
+  }
+
+  // Update the status of a tweet
+  async updateTweetStatus(tweetId: string, status: TweetStatus): Promise<void> {
+    const db = await this.connect();
+    await db.collection('tweets').updateOne(
+      { _id: new ObjectId(tweetId) },
+      { 
+        $set: { 
+          status,
+          updatedAt: new Date()
+        } 
+      }
+    );
+  }
 }
 
-// Updated: dbClient now needs to be initialized with MONGODB_URI
-// export const dbClient = DatabaseClient.getInstance(); 
-// You will need to initialize it like this in your app/scheduler:
-// import { MONGODB_URI } from '$env/static/private'; // Or process.env.MONGODB_URI for scheduler
-// import { DatabaseClient } from 'shared-lib'; 
-// export const dbClient = DatabaseClient.getInstance(MONGODB_URI);
-
-export { DatabaseClient }; // Export the class itself 
+export { DatabaseClient };
