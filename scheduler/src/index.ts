@@ -1,8 +1,8 @@
 import { DatabaseClient } from 'shared-lib/backend';
 import { Tweet } from 'shared-lib';
-import { TokenManager } from './tokenManager';
-import { MONGODB_URI, SCHEDULER_INTERVAL_MINUTES } from './config';
-import { TweetProcessor } from './tweetProcessor';
+import { TokenManager } from './tokenManager.js';
+import { MONGODB_URI, SCHEDULER_INTERVAL_MINUTES } from './config.js';
+import { TweetProcessor } from './tweetProcessor.js';
 
 // Initialize database client
 const dbClient = DatabaseClient.getInstance(MONGODB_URI);

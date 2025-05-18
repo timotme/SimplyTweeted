@@ -1,6 +1,6 @@
 import { DatabaseClient } from 'shared-lib/backend';
 import { TweetStatus, Tweet, UserAccount } from 'shared-lib';
-import { TokenManager } from './tokenManager';
+import { TokenManager } from './tokenManager.js';
 import { TwitterApi } from 'twitter-api-v2';
 
 export class TweetProcessor {

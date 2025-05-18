@@ -2,7 +2,7 @@ import { TwitterApi, IParsedOAuth2TokenResult } from 'twitter-api-v2';
 import { TwitterApiAutoTokenRefresher } from '@twitter-api-v2/plugin-token-refresher';
 import { UserAccount } from 'shared-lib';
 import { DatabaseClient } from 'shared-lib/backend';
-import { AUTH_TWITTER_ID, TWITTER_API_SECRET } from './config';
+import { AUTH_TWITTER_ID, TWITTER_API_SECRET } from './config.js';
 
 export class TokenManager {
   private dbClient: DatabaseClient;
