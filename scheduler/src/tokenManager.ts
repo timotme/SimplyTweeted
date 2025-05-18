@@ -2,7 +2,7 @@ import { TwitterApi, IParsedOAuth2TokenResult } from 'twitter-api-v2';
 import { TwitterApiAutoTokenRefresher } from '@twitter-api-v2/plugin-token-refresher';
 import { UserAccount } from 'shared-lib';
 import { DatabaseClient } from 'shared-lib/backend';
-import { AUTH_TWITTER_ID, TWITTER_API_SECRET } from './config.js';
+import { AUTH_TWITTER_ID, AUTH_TWITTER_SECRET } from './config.js';
 
 export class TokenManager {
   private dbClient: DatabaseClient;
@@ -20,7 +20,7 @@ export class TokenManager {
       refreshToken: account.refresh_token,
       refreshCredentials: {
         clientId: AUTH_TWITTER_ID,
-        clientSecret: TWITTER_API_SECRET,
+        clientSecret: AUTH_TWITTER_SECRET,
       },
       onTokenUpdate: async (token: IParsedOAuth2TokenResult) => {
         console.log(`Token updated for user ${account.userId}. New access token: ${token.accessToken}`);

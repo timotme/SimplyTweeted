@@ -1,7 +1,7 @@
 import { MongoClient, ObjectId } from 'mongodb';
 import type { Tweet, UserAccount } from '../types/types'; 
 import { TweetStatus } from '../types/types'; 
-import { encrypt, decrypt } from './encryption';
+import { EncryptionService } from './encryption';
 
 const DB_NAME = 'simplyTweeted';
 
@@ -10,18 +10,26 @@ class DatabaseClient {
   private client: MongoClient;
   private connected = false;
   private mongoDbUri: string;
+  private encryptionService: EncryptionService;
 
-  private constructor(mongoDbUri: string) {
+  private constructor(mongoDbUri: string, authSecret: string) {
     this.mongoDbUri = mongoDbUri;
     this.client = new MongoClient(this.mongoDbUri);
+    if (!authSecret) {
+        throw new Error("Auth Secret is required for DatabaseClient initialization");
+    }
+    this.encryptionService = new EncryptionService(authSecret);
   }
 
-  public static getInstance(mongoDbUri?: string): DatabaseClient {
+  public static getInstance(mongoDbUri?: string, authSecret?: string): DatabaseClient {
     if (!DatabaseClient.instance) {
       if (!mongoDbUri) {
         throw new Error("MongoDB URI is required for the first instantiation of DatabaseClient");
       }
-      DatabaseClient.instance = new DatabaseClient(mongoDbUri);
+      if (!authSecret) {
+        throw new Error("Auth Secret is required for the first instantiation of DatabaseClient");
+      }
+      DatabaseClient.instance = new DatabaseClient(mongoDbUri, authSecret);
     }
     return DatabaseClient.instance;
   }
@@ -143,8 +151,8 @@ class DatabaseClient {
     // Encrypt sensitive data
     const encryptedAccount = {
       ...userAccount,
-      access_token: encrypt(userAccount.access_token),
-      refresh_token: encrypt(userAccount.refresh_token),
+      access_token: this.encryptionService.encrypt(userAccount.access_token),
+      refresh_token: this.encryptionService.encrypt(userAccount.refresh_token),
       updatedAt: new Date()
     };
     
@@ -186,8 +194,8 @@ class DatabaseClient {
     const { _id, ...accountData } = account;
     return {
       ...accountData,
-      access_token: decrypt(account.access_token),
-      refresh_token: decrypt(account.refresh_token)
+      access_token: this.encryptionService.decrypt(account.access_token),
+      refresh_token: this.encryptionService.decrypt(account.refresh_token)
     } as UserAccount;
   }
 
@@ -204,8 +212,8 @@ class DatabaseClient {
       const { _id, ...accountData } = account;
       return {
         ...accountData,
-        access_token: decrypt(account.access_token),
-        refresh_token: decrypt(account.refresh_token)
+        access_token: this.encryptionService.decrypt(account.access_token),
+        refresh_token: this.encryptionService.decrypt(account.refresh_token)
       } as UserAccount;
     });
   }

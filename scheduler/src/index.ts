@@ -1,11 +1,11 @@
 import { DatabaseClient } from 'shared-lib/backend';
 import { Tweet } from 'shared-lib';
 import { TokenManager } from './tokenManager.js';
-import { MONGODB_URI, SCHEDULER_INTERVAL_MINUTES } from './config.js';
+import { MONGODB_URI, DB_ENCRYPTION_KEY } from './config.js';
 import { TweetProcessor } from './tweetProcessor.js';
 
 // Initialize database client
-const dbClient = DatabaseClient.getInstance(MONGODB_URI);
+const dbClient = DatabaseClient.getInstance(MONGODB_URI, DB_ENCRYPTION_KEY);
 // Initialize token manager
 const tokenManager = new TokenManager(dbClient);
 // Initialize TweetProcessor
@@ -45,10 +45,6 @@ async function processTweets() {
 // Run scheduler immediately on startup
 processTweets();
 
-// Set interval to run scheduler
-setInterval(processTweets, SCHEDULER_INTERVAL_MINUTES * 60 * 1000);
-
-console.log(`Scheduler started. Running every ${SCHEDULER_INTERVAL_MINUTES} minutes.`);
 
 // Handle graceful shutdown
 process.on('SIGINT', async () => {

@@ -1,12 +1,11 @@
-import { DatabaseClient, initEncryption } from 'shared-lib/backend';
-import { MONGODB_URI, AUTH_SECRET } from '$env/static/private';
+import { MONGODB_URI, AUTH_SECRET, DB_ENCRYPTION_KEY } from '$env/static/private';
+import { DatabaseClient } from 'shared-lib/backend';
 
 if (!MONGODB_URI) {
   throw new Error('MONGODB_URI is not set in environment variables for Svelte app');
 }
-if (!AUTH_SECRET) {
-  throw new Error('AUTH_SECRET is not set in environment variables for Svelte app');
+if (!DB_ENCRYPTION_KEY) {
+  throw new Error('DB_ENCRYPTION_KEY is not set in environment variables for Svelte app');
 }
 
-initEncryption(AUTH_SECRET);
-export const dbClient = DatabaseClient.getInstance(MONGODB_URI); 
+export const dbClient = DatabaseClient.getInstance(MONGODB_URI, DB_ENCRYPTION_KEY); 
