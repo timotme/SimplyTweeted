@@ -1,8 +1,9 @@
 import { DatabaseClient } from 'shared-lib/backend';
 import { Tweet } from 'shared-lib';
 import { TokenManager } from './tokenManager.js';
-import { MONGODB_URI, DB_ENCRYPTION_KEY } from './config.js';
+import { MONGODB_URI, DB_ENCRYPTION_KEY, CRON_SCHEDULE } from './config.js';
 import { TweetProcessor } from './tweetProcessor.js';
+import cron from 'node-cron';
 
 // Initialize database client
 const dbClient = DatabaseClient.getInstance(MONGODB_URI, DB_ENCRYPTION_KEY);
@@ -42,9 +43,23 @@ async function processTweets() {
   }
 }
 
-// Run scheduler immediately on startup
-processTweets();
-
+// Check for 'runOnce' argument
+if (process.argv.includes('runOnce')) {
+  processTweets().then(() => {
+    console.log('Finished processing tweets once.');
+    dbClient.close().then(() => process.exit(0));
+  }).catch(error => {
+    console.error('Error during single run:', error);
+    dbClient.close().then(() => process.exit(1));
+  });
+} else {
+  // Schedule the cron job
+  cron.schedule(CRON_SCHEDULE, () => {
+    console.log(`Cron job triggered with schedule: ${CRON_SCHEDULE}`);
+    processTweets();
+  });
+  console.log(`Scheduler started with cron schedule: ${CRON_SCHEDULE}`);
+}
 
 // Handle graceful shutdown
 process.on('SIGINT', async () => {
