@@ -1,0 +1,17 @@
+{
+  "name": "simply-tweeted-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Monorepo for the SimplyTweeted project",
+  "workspaces": [
+    "packages/simply-tweeted-app",
+    "packages/shared-lib",
+    "packages/scheduler"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+} 

@@ -15,6 +15,7 @@
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^6.0.0",
+		"@sveltejs/adapter-node": "^5.2.12",
 		"@sveltejs/kit": "^2.16.0",
 		"@sveltejs/vite-plugin-svelte": "^5.0.0",
 		"@tailwindcss/vite": "^4.1.7",
@@ -34,7 +35,6 @@
 		"emoji-picker-element": "^1.26.3",
 		"install": "^0.13.0",
 		"mongodb": "^6.16.0",
-		"npm": "^11.4.0",
-		"shared-lib": "file:../../packages/shared-lib"
+		"npm": "^11.4.0"
 	}
 }
