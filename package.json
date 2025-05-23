@@ -4,9 +4,7 @@
   "private": true,
   "description": "Monorepo for the SimplyTweeted project",
   "workspaces": [
-    "packages/simply-tweeted-app",
-    "packages/shared-lib",
-    "packages/scheduler"
+    "packages/*"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

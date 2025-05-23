@@ -1,45 +1,51 @@
-version: '3.8'
-
 services:
   mongo:
     image: mongo:latest
     container_name: mongo
     ports:
-      - "27017:27017"
+      - "27018:27017"
     volumes:
-      - ./deployment/mongo-init:/docker-entrypoint-initdb.d
-      - mongo_data:/data/db
+      - ../mongo-init:/docker-entrypoint-initdb.d
     environment:
       MONGO_INITDB_DATABASE: simplyTweeted
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    networks:
+      - tweet-scheduler-network
 
-  scheduler:
-    build:
-      context: ./scheduler
-      dockerfile: Dockerfile # Assuming a Dockerfile exists in the scheduler directory
-    container_name: scheduler
-    depends_on:
-      - mongo
-    environment:
-      DATABASE_URL: mongodb://mongo:27017/simplyTweeted
-      # Add other necessary environment variables for the scheduler
-    volumes:
-      - ./scheduler:/usr/src/app
-      - /usr/src/app/node_modules # Mount node_modules separately to avoid overwriting by local
-    # command: npm start # Or whatever command starts your scheduler
+  # scheduler:
+  #   build:
+  #     context: ../../packages/
+  #     dockerfile: Dockerfile # Assuming a Dockerfile exists in the scheduler directory
+  #   container_name: scheduler
+  #   depends_on:
+  #     - mongo
+  #   environment:
+  #     DATABASE_URL: mongodb://mongo:27017/simplyTweeted
+  #     # Add other necessary environment variables for the scheduler
+  #   volumes:
+  #     - ./scheduler:/usr/src/app
+  #     - /usr/src/app/node_modules # Mount node_modules separately to avoid overwriting by local
+  #   # command: npm start # Or whatever command starts your scheduler
 
   frontend:
     build:
-      context: ./app/simply-tweeted-app # Updated path
-      dockerfile: Dockerfile # Assuming a Dockerfile exists
+      context: ../../ # Updated path
+      dockerfile: packages/simply-tweeted-app/Dockerfile # Assuming a Dockerfile exists
     container_name: frontend
     ports:
-      - "80:3000" # Assuming Svelte app runs on 3000, mapped to host 80
+      - "3001:3000" # Assuming Svelte app runs on 3000, mapped to host 80
     depends_on:
-      - scheduler # If it makes API calls to the scheduler
+      - mongo # If it makes API calls to the scheduler
+    env_file:
+      - .env.docker
     # Add any necessary environment variables for the frontend
-    volumes:
-      - ./app/simply-tweeted-app:/usr/src/app
-      - /usr/src/app/node_modules
+    # volumes:
+    #   - ./app/simply-tweeted-app:/usr/src/app
+    #   - /usr/src/app/node_modules
+    networks:
+      - tweet-scheduler-network
 
-volumes:
-  mongo_data: 
+networks:
+  tweet-scheduler-network:
+    driver: bridge

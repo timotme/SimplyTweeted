@@ -1,6 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { dbClient } from '$lib/server/db';
+import { getDbInstance } from '$lib/server/db';
 import { TweetStatus } from 'shared-lib';
 
 const TWEETS_PER_PAGE = 10;
@@ -15,10 +15,10 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	const page = parseInt(url.searchParams.get('page') || '1');
 
 	try {
-		// Use the generic utility functions from dbClient for cleaner code
+		// Use the generic utility functions from db for cleaner code
 		const [tweets, totalTweets] = await Promise.all([
-			dbClient.getTweets(userId, page, TWEETS_PER_PAGE, TweetStatus.SCHEDULED, 1),
-			dbClient.countTweets(userId, TweetStatus.SCHEDULED)
+			getDbInstance().getTweets(userId, page, TWEETS_PER_PAGE, TweetStatus.SCHEDULED, 1),
+			getDbInstance().countTweets(userId, TweetStatus.SCHEDULED)
 		]);
 
 		return {
@@ -49,8 +49,7 @@ export const actions: Actions = {
 		}
 
 		try {
-			// Use the utility function from dbClient
-			const result = await dbClient.deleteTweet(tweetId, userId);
+			const result = await getDbInstance().deleteTweet(tweetId, userId);
 			
 			if (!result.success) {
 				return fail(404, { error: 'Tweet not found or you do not have permission to delete it' });

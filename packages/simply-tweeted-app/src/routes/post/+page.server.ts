@@ -1,6 +1,6 @@
 import { redirect, fail } from '@sveltejs/kit';
 import type { Actions, RequestEvent } from '@sveltejs/kit';
-import { dbClient } from '$lib/server/db';
+import { getDbInstance } from '$lib/server/db';
 import { TweetStatus, type Tweet } from 'shared-lib';
 
 export const load = async (event: RequestEvent) => {
@@ -61,7 +61,7 @@ export const actions: Actions = {
 				createdAt: new Date()
 			};
 			
-			await dbClient.saveTweet(tweet);
+			await getDbInstance().saveTweet(tweet);
 			success = true;
 		} catch (error) {
 			console.error('Failed to save tweet:', error);

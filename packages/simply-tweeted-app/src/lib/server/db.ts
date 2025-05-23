@@ -1,11 +1,18 @@
-import { MONGODB_URI, AUTH_SECRET, DB_ENCRYPTION_KEY } from '$env/static/private';
+import { MONGODB_URI, DB_ENCRYPTION_KEY } from '$lib/server/env';
 import { DatabaseClient } from 'shared-lib/backend';
 
-if (!MONGODB_URI) {
-  throw new Error('MONGODB_URI is not set in environment variables for Svelte app');
-}
-if (!DB_ENCRYPTION_KEY) {
-  throw new Error('DB_ENCRYPTION_KEY is not set in environment variables for Svelte app');
+// Create a lazy-loaded singleton pattern
+let dbInstance: DatabaseClient | null = null;
+
+export function getDbInstance(): DatabaseClient {
+    if (!dbInstance) {
+        dbInstance = DatabaseClient.getInstance(MONGODB_URI, DB_ENCRYPTION_KEY);
+    }
+    return dbInstance;
 }
 
-export const dbClient = DatabaseClient.getInstance(MONGODB_URI, DB_ENCRYPTION_KEY); 
+export const initializeDatabase = async (): Promise<DatabaseClient> => {
+    const db = getDbInstance();
+    await db.connect();
+    return db;
+};
