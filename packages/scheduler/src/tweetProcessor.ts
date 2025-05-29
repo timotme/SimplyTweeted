@@ -2,6 +2,7 @@ import { DatabaseClient } from 'shared-lib/backend';
 import { TweetStatus, Tweet, UserAccount } from 'shared-lib';
 import { TokenManager } from './tokenManager.js';
 import { TwitterApi } from 'twitter-api-v2';
+import { log } from './logger.js';
 
 export class TweetProcessor {
   private dbClient: DatabaseClient;
@@ -14,18 +15,28 @@ export class TweetProcessor {
 
   private async markTweetsAsFailed(tweets: Tweet[], reason: string, userId?: string) {
     const forUser = userId ? ` for user ${userId}` : '';
-    console.error(`Marking ${tweets.length} tweets as FAILED${forUser}. Reason: ${reason}`);
+    log.error(`Marking ${tweets.length} tweets as FAILED${forUser}. Reason: ${reason}`, { 
+      tweetCount: tweets.length,
+      userId,
+      reason 
+    });
     for (const tweet of tweets) {
       try {
         await this.dbClient.updateTweetStatus(tweet.id!, TweetStatus.FAILED);
       } catch (dbError) {
-        console.error(`Error updating status for tweet ${tweet.id} to FAILED:`, dbError);
+        log.error(`Error updating status for tweet ${tweet.id} to FAILED:`, { 
+          tweetId: tweet.id,
+          error: dbError 
+        });
       }
     }
   }
 
   async processUserTweets(userId: string, tweets: Tweet[]): Promise<void> {
-    console.log(`Processing ${tweets.length} tweets for user ${userId}`);
+    log.info(`Processing ${tweets.length} tweets for user ${userId}`, { 
+      userId,
+      tweetCount: tweets.length 
+    });
     try {
       const userAccounts = await this.dbClient.getUserAccounts(userId);
       if (userAccounts.length === 0) {
@@ -43,12 +54,22 @@ export class TweetProcessor {
 
       for (const tweet of tweets) {
         try {
-          console.log(`Attempting to post tweet ${tweet.id} for user ${userId}`);
+          log.info(`Attempting to post tweet ${tweet.id} for user ${userId}`, { 
+            tweetId: tweet.id,
+            userId 
+          });
           await twitterV2Client.v2.tweet(tweet.content);
           await this.dbClient.updateTweetStatus(tweet.id!, TweetStatus.POSTED);
-          console.log(`Successfully posted tweet ${tweet.id}`);
+          log.info(`Successfully posted tweet ${tweet.id}`, { 
+            tweetId: tweet.id,
+            userId 
+          });
         } catch (error) {
-          console.error(`Error posting tweet ${tweet.id} for user ${userId}:`, error);
+          log.error(`Error posting tweet ${tweet.id} for user ${userId}:`, { 
+            tweetId: tweet.id,
+            userId,
+            error 
+          });
           await this.markTweetsAsFailed([tweet], `API error during posting for tweet ${tweet.id}`, userId);
         }
       }

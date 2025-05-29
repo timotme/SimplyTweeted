@@ -3,6 +3,7 @@ import { Tweet } from 'shared-lib';
 import { TokenManager } from './tokenManager.js';
 import { MONGODB_URI, DB_ENCRYPTION_KEY, CRON_SCHEDULE } from './config.js';
 import { TweetProcessor } from './tweetProcessor.js';
+import { log } from './logger.js';
 import cron from 'node-cron';
 
 // Initialize database client
@@ -13,11 +14,11 @@ const tokenManager = new TokenManager(dbClient);
 const tweetProcessor = new TweetProcessor(dbClient, tokenManager);
 
 async function processTweets() {
-  console.log('Starting tweet processing...');
+  log.info('Starting tweet processing...');
   try {
     // Step 1: Find all due tweets
     const dueTweets = await dbClient.findDueTweets();
-    console.log(`Found ${dueTweets.length} tweets to process`);
+    log.info(`Found ${dueTweets.length} tweets to process`, { tweetCount: dueTweets.length });
     
     if (dueTweets.length === 0) {
       return;
@@ -39,37 +40,37 @@ async function processTweets() {
     }
   } catch (error) {
     // Catch high-level errors (e.g., finding due tweets)
-    console.error('Error in processTweets main loop:', error);
+    log.error('Error in processTweets main loop:', { error });
   }
 }
 
 // Check for 'runOnce' argument
 if (process.argv.includes('runOnce')) {
   processTweets().then(() => {
-    console.log('Finished processing tweets once.');
+    log.info('Finished processing tweets once.');
     dbClient.close().then(() => process.exit(0));
   }).catch(error => {
-    console.error('Error during single run:', error);
+    log.error('Error during single run:', { error });
     dbClient.close().then(() => process.exit(1));
   });
 } else {
   // Schedule the cron job
   cron.schedule(CRON_SCHEDULE, () => {
-    console.log(`Cron job triggered with schedule: ${CRON_SCHEDULE}`);
+    log.info(`Cron job triggered with schedule: ${CRON_SCHEDULE}`, { cronSchedule: CRON_SCHEDULE });
     processTweets();
   });
-  console.log(`Scheduler started with cron schedule: ${CRON_SCHEDULE}`);
+  log.info(`Scheduler started with cron schedule: ${CRON_SCHEDULE}`, { cronSchedule: CRON_SCHEDULE });
 }
 
 // Handle graceful shutdown
 process.on('SIGINT', async () => {
-  console.log('Shutting down scheduler...');
+  log.info('Shutting down scheduler...');
   await dbClient.close();
   process.exit(0);
 });
 
 process.on('SIGTERM', async () => {
-  console.log('Shutting down scheduler...');
+  log.info('Shutting down scheduler...');
   await dbClient.close();
   process.exit(0);
 }); 
