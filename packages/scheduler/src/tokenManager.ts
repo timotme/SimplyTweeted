@@ -3,6 +3,7 @@ import { TwitterApiAutoTokenRefresher } from '@twitter-api-v2/plugin-token-refre
 import { UserAccount } from 'shared-lib';
 import { DatabaseClient } from 'shared-lib/backend';
 import { AUTH_TWITTER_ID, AUTH_TWITTER_SECRET } from './config.js';
+import { log } from './logger.js';
 
 export class TokenManager {
   private dbClient: DatabaseClient;
@@ -23,7 +24,10 @@ export class TokenManager {
         clientSecret: AUTH_TWITTER_SECRET,
       },
       onTokenUpdate: async (token: IParsedOAuth2TokenResult) => {
-        console.log(`Token updated for user ${account.userId}. New access token: ${token.accessToken}`);
+        log.info(`Token updated for user ${account.userId}. New access token: ${token.accessToken}`, { 
+          userId: account.userId, 
+          accessToken: token.accessToken?.substring(0, 10) + '...' // Log only first 10 chars for security
+        });
         
         // Calculate expires_at. token.expiresIn is in seconds.
         const newExpiresAt = token.expiresIn ? Math.floor(Date.now() / 1000) + token.expiresIn : account.expires_at;
@@ -38,13 +42,13 @@ export class TokenManager {
         };
         try {
           await this.dbClient.saveUserAccount(updatedAccount);
-          console.log(`Successfully saved updated token for user ${account.userId}`);
+          log.info(`Successfully saved updated token for user ${account.userId}`, { userId: account.userId });
         } catch (error) {
-          console.error(`Error saving updated token for user ${account.userId}:`, error);
+          log.error(`Error saving updated token for user ${account.userId}:`, { userId: account.userId, error });
         }
       },
       onTokenRefreshError: (error) => {
-        console.error(`Error refreshing token for user ${account.userId} via plugin:`, error);
+        log.error(`Error refreshing token for user ${account.userId} via plugin:`, { userId: account.userId, error });
       },
     });
 

@@ -1,6 +1,7 @@
 import { error, redirect } from '@sveltejs/kit';
 import { getDbInstance } from '$lib/server/db';
 import { TweetStatus } from 'shared-lib';
+import { log } from '$lib/server/logger.js';
 
 const TWEETS_PER_PAGE = 10;
 
@@ -25,7 +26,7 @@ export const load = (async ({ locals, url }) => {
 			session
 		};
 	} catch (err) {
-		console.error('Error fetching tweet history:', err);
+		log.error('Error fetching tweet history:', { userId, page, error: err });
 		throw error(500, 'Failed to load tweets');
 	}
 });
