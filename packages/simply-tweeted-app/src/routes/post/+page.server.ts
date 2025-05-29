@@ -3,6 +3,7 @@ import type { Actions, RequestEvent } from '@sveltejs/kit';
 import { getDbInstance } from '$lib/server/db';
 import { TweetStatus, type Tweet } from 'shared-lib';
 import { fromZonedTime } from 'date-fns-tz';
+import { log } from '$lib/server/logger.js';
 
 // Helper function to convert local time to UTC
 function convertToUTC(date: string, time: string, timezone: string): Date {
@@ -22,7 +23,7 @@ function convertToUTC(date: string, time: string, timezone: string): Date {
 		return utcDate;
 		
 	} catch (error) {
-		console.error('Error converting timezone:', error, 'for timezone:', timezone);
+		log.error('Error converting timezone:', { error, timezone, date, time });
 		// Fallback: treat as UTC if timezone conversion fails
 		return new Date(`${date}T${time}:00.000Z`);
 	}
@@ -90,7 +91,7 @@ export const actions: Actions = {
 			await getDbInstance().saveTweet(tweet);
 			success = true;
 		} catch (error) {
-			console.error('Failed to save tweet:', error);
+			log.error('Failed to save tweet:', { userId: session.user.id, content, error });
 			return fail(500, { content, error: 'Failed to schedule tweet. Please try again.' });
 		}
 

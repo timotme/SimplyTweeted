@@ -2,6 +2,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getDbInstance } from '$lib/server/db';
 import { TweetStatus } from 'shared-lib';
+import { log } from '$lib/server/logger.js';
 
 const TWEETS_PER_PAGE = 10;
 
@@ -28,7 +29,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 			session
 		};
 	} catch (error) {
-		console.error("Error loading scheduled tweets:", error);
+		log.error("Error loading scheduled tweets:", { userId, page, error });
 		return fail(500, { error: "Failed to load scheduled tweets." });
 	}
 };
@@ -57,7 +58,7 @@ export const actions: Actions = {
 
 			return { success: true, deletedTweetId: tweetId };
 		} catch (error) {
-			console.error('Error deleting tweet:', error);
+			log.error('Error deleting tweet:', { userId, tweetId, error });
 			
 			// Check if it's an invalid ObjectId error
 			if (error instanceof Error && error.message.includes('ObjectId')) {
