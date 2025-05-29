@@ -16,7 +16,7 @@
 						<h3 class="card-title">Schedule New Tweet</h3>
 						<p>Create and schedule your next tweet.</p>
 						<div class="card-actions justify-end">
-							<button class="btn btn-primary">Create Tweet</button>
+							<a href="/post" class="btn btn-primary">Create Tweet</a>
 						</div>
 					</div>
 				</div>
@@ -26,7 +26,7 @@
 						<h3 class="card-title">Your Scheduled Tweets</h3>
 						<p>View and manage your upcoming tweets.</p>
 						<div class="card-actions justify-end">
-							<button class="btn btn-primary">View All</button>
+							<a href="/scheduled" class="btn btn-primary">View All</a>
 						</div>
 					</div>
 				</div>

@@ -6,6 +6,7 @@ services:
       - "27018:27017"
     volumes:
       - ../mongo-init:/docker-entrypoint-initdb.d
+      - mongo-data:/data/db
     environment:
       MONGO_INITDB_DATABASE: simplyTweeted
       MONGO_INITDB_ROOT_USERNAME: root
@@ -30,3 +31,6 @@ services:
 networks:
   tweet-scheduler-network:
     driver: bridge
+
+volumes:
+  mongo-data:
