@@ -32,6 +32,7 @@
 		"@auth/sveltekit": "^1.9.2",
 		"@types/node": "^22.15.18",
 		"daisyui": "^5.0.35",
+		"date-fns-tz": "^3.2.0",
 		"emoji-picker-element": "^1.26.3",
 		"install": "^0.13.0",
 		"mongodb": "^6.16.0",

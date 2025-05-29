@@ -11,12 +11,14 @@
 	let isDateTimeValid = true;
 	let showEmojiPicker = false;
 	let emojiPickerElement: HTMLElement;
+	let userTimezone = '';
 	
 	$: charCount = tweetContent.length;
 	$: isValidTweet = charCount > 0 && charCount <= 280 && isDateTimeValid;
 	
 	$: {
 		const now = new Date();
+		// Create the scheduled date/time in the user's local timezone for validation
 		const scheduledDateTime = new Date(`${scheduledDate}T${scheduledTime}`);
 		isDateTimeValid = scheduledDateTime > now;
 	}
@@ -36,6 +38,9 @@
 		if (browser) {
 			await import('emoji-picker-element');
 			window.addEventListener('click', handleClickOutside, true);
+			
+			// Detect user's timezone
+			userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 		}
 	});
 
@@ -130,6 +135,9 @@
 						<option value="build in public">Build in Public</option>
 					</select>
 				</div>
+				
+				<!-- Hidden input to send user's timezone -->
+				<input type="hidden" name="timezone" value={userTimezone} />
 				
 				<div class="form-control mt-6">
 					<button type="submit" class="btn btn-primary" disabled={!isValidTweet}>
