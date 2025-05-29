@@ -1,5 +1,5 @@
 # Stage 1: Build the SvelteKit application and scheduler
-FROM node:22-bullseye-slim AS builder
+FROM --platform=linux/amd64 node:22-bullseye-slim AS builder
 
 WORKDIR /app
 
@@ -29,8 +29,7 @@ WORKDIR /app/packages/scheduler
 RUN npm run build
 
 # Stage 2: Production environment
-FROM node:22-alpine
-
+FROM --platform=$TARGETPLATFORM node:22-bullseye-slim
 # Create a non-root user and group
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S app -u 1001 -G nodejs
