@@ -14,8 +14,16 @@ npm install
 ```
 # Auth
 AUTH_SECRET="your-auth-secret" # Generate with `openssl rand -base64 32`
-TWITTER_CLIENT_ID="your-twitter-client-id"
-TWITTER_CLIENT_SECRET="your-twitter-client-secret"
+AUTH_TRUST_HOST="true" # Set to true for local development
+AUTH_TWITTER_ID="your-twitter-client-id"
+AUTH_TWITTER_SECRET="your-twitter-client-secret"
+
+# Database
+MONGODB_URI="your-mongodb-connection-string"
+DB_ENCRYPTION_KEY="your-db-encryption-key" # Generate with `openssl rand -base64 32`
+
+# Security
+ALLOWED_TWITTER_ACCOUNTS="username1,username2" # Comma-separated list of allowed Twitter usernames
 ```
 
 4. To get Twitter (X) API credentials:
@@ -25,9 +33,13 @@ TWITTER_CLIENT_SECRET="your-twitter-client-secret"
      ```
      http://localhost:5173/api/auth/callback/twitter
      ```
-   - Save your Client ID and Client Secret for the .env file
+   - Save your Client ID and Client Secret for the .env file as AUTH_TWITTER_ID and AUTH_TWITTER_SECRET
 
-5. Run the development server:
+5. Set up MongoDB:
+   - Create a MongoDB database (locally or using MongoDB Atlas)
+   - Copy the connection string to the MONGODB_URI environment variable
+
+6. Run the development server:
 ```bash
 npm run dev
 ```
@@ -37,3 +49,5 @@ npm run dev
 - X (Twitter) OAuth authentication
 - Tweet scheduling
 - Dashboard for managing scheduled tweets
+- MongoDB database for data persistence
+- Access control via allowed Twitter accounts

@@ -65,6 +65,7 @@ npm run dev
 ```
 
 ### Single Run (Testing)
+Will run the tweet posting logic only once, not starting the cron
 ```bash
 npm run dev:once
 ```
