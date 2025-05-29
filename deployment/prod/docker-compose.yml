@@ -1,0 +1,32 @@
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    ports:
+      - "27018:27017"
+    volumes:
+      - ../mongo-init:/docker-entrypoint-initdb.d
+    environment:
+      MONGO_INITDB_DATABASE: simplyTweeted
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    networks:
+      - tweet-scheduler-network
+
+  app:
+    build:
+      context: ../../
+      dockerfile: deployment/prod/Dockerfile
+    container_name: simply-tweeted-app
+    ports:
+      - "3001:3000"
+    depends_on:
+      - mongo
+    env_file:
+      - .env.docker
+    networks:
+      - tweet-scheduler-network
+
+networks:
+  tweet-scheduler-network:
+    driver: bridge

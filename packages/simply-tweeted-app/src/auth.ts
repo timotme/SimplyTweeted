@@ -1,13 +1,14 @@
 import { SvelteKitAuth } from "@auth/sveltekit"
 import Twitter from "@auth/sveltekit/providers/twitter"
-import { ALLOWED_TWITTER_ACCOUNTS, AUTH_TWITTER_ID, AUTH_TWITTER_SECRET } from "$env/static/private";
-import { dbClient } from '$lib/server/db';
+import { ALLOWED_TWITTER_ACCOUNTS, AUTH_TWITTER_ID, AUTH_TWITTER_SECRET, AUTH_TRUST_HOST } from '$lib/server/env';
+import { getDbInstance } from '$lib/server/db';
 import type { UserAccount } from 'shared-lib';
  
 // List of allowed Twitter account usernames/IDs
-const allowedAccounts = ALLOWED_TWITTER_ACCOUNTS.split(',').map(account => account.trim());
+const allowedAccounts = ALLOWED_TWITTER_ACCOUNTS.split(',').map((account: string) => account.trim());
 
 export const { handle, signIn, signOut } = SvelteKitAuth({
+  trustHost: AUTH_TRUST_HOST === 'true',
   providers: [
     Twitter({
       clientId: AUTH_TWITTER_ID,
@@ -48,7 +49,7 @@ export const { handle, signIn, signOut } = SvelteKitAuth({
             };
             
             // Save to database
-            await dbClient.saveUserAccount(userAccount);
+            await getDbInstance().saveUserAccount(userAccount);
           }
           
           return isAllowed;

@@ -9,7 +9,7 @@
 			<p class="py-6">Schedule your tweets with ease. Login to get started.</p>
 			<div>
 				<!-- <img src="/img/logo.svg" alt="Company Logo" /> -->
-				<button on:click={() => signIn('twitter')} class="btn btn-primary"
+				<button onclick={() => signIn('twitter')} class="btn btn-primary"
 					>Sign in with Twitter</button
 				>
 			</div>

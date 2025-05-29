@@ -1,2 +1,2 @@
-export { DatabaseClient } from './db';
-export { EncryptionService } from './encryption';
+export { DatabaseClient } from './db.js';
+export { EncryptionService } from './encryption.js';

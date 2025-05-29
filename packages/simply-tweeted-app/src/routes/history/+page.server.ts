@@ -1,5 +1,5 @@
-import { error, fail, redirect } from '@sveltejs/kit';
-import { dbClient } from '$lib/server/db';
+import { error, redirect } from '@sveltejs/kit';
+import { getDbInstance } from '$lib/server/db';
 import { TweetStatus } from 'shared-lib';
 
 const TWEETS_PER_PAGE = 10;
@@ -13,10 +13,9 @@ export const load = (async ({ locals, url }) => {
 	const page = Number(url.searchParams.get('page')) || 1;
 
 	try {
-		// Use the generic utility functions from dbClient
 		const [tweets, totalTweets] = await Promise.all([
-			dbClient.getTweets(userId, page, TWEETS_PER_PAGE, [TweetStatus.POSTED, TweetStatus.FAILED], -1),
-			dbClient.countTweets(userId, [TweetStatus.POSTED, TweetStatus.FAILED])
+			getDbInstance().getTweets(userId, page, TWEETS_PER_PAGE, [TweetStatus.POSTED, TweetStatus.FAILED], -1),
+			getDbInstance().countTweets(userId, [TweetStatus.POSTED, TweetStatus.FAILED])
 		]);
 
 		return {

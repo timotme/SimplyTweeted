@@ -1,7 +1,6 @@
 import { MongoClient, ObjectId } from 'mongodb';
-import type { Tweet, UserAccount } from '../types/types'; 
-import { TweetStatus } from '../types/types'; 
-import { EncryptionService } from './encryption';
+import { TweetStatus, Tweet, UserAccount } from '../types/types.js';
+import { EncryptionService } from './encryption.js';
 
 const DB_NAME = 'simplyTweeted';
 
