@@ -7,7 +7,13 @@
     "packages/*"
   ],
   "scripts": {
+    "dev": "concurrently --names \"APP,SCHEDULER\" --prefix-colors \"blue,green\" \"npm run dev --workspace=simply-tweeted-app\" \"npm run dev --workspace=tweet-poster-service\"",
+    "build": "npm run build --workspace=simply-tweeted-app && npm run build --workspace=tweet-poster-service",
+    "start": "concurrently --names \"APP,SCHEDULER\" --prefix-colors \"blue,green\" \"npm run preview --workspace=simply-tweeted-app\" \"npm run start --workspace=tweet-poster-service\"",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   },
   "keywords": [],
   "author": "",
