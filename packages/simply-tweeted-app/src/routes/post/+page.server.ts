@@ -1,7 +1,7 @@
 import { redirect, fail } from '@sveltejs/kit';
 import type { Actions, RequestEvent } from '@sveltejs/kit';
 import { getDbInstance } from '$lib/server/db';
-import { TweetStatus, type Tweet } from 'shared-lib';
+import { TweetStatus, type Tweet, getAvailableCommunities } from 'shared-lib';
 import { fromZonedTime } from 'date-fns-tz';
 import { log } from '$lib/server/logger.js';
 
@@ -36,8 +36,12 @@ export const load = async (event: RequestEvent) => {
 		throw redirect(303, '/login');
 	}
 	
+	// Get available communities from shared-lib
+	const availableCommunities = getAvailableCommunities();
+	
 	return {
-		session
+		session,
+		availableCommunities
 	};
 };
 
