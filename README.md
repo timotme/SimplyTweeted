@@ -1,14 +1,128 @@
 # Simply Tweeted
 
-A clean, intuitive tweet scheduling platform that makes managing your X (Twitter) content effortless.
+A clean, intuitive tweet scheduling platform that makes scheduling your X (Twitter) content effortless.
 
 
 ## Features
 
-- **📅 Tweet Scheduling**: Plan your content in advance and let Simply Tweeted post it at the perfect time
+- **📅 Tweet Scheduling**: Plan your content in advance and let Simply Tweeted post it at the perfect time. **Support posting on communities**
 - **🔐 Authentication**: OAuth integration with X (Twitter) for secure access
 - **🔒 Token Security**: User tokens are encrypted and securely stored in the database
 - **📱 Responsive Design**: Works seamlessly on desktop and mobile devices
+
+
+## How to selfhost Simply Tweeted
+
+Simply Tweeted can be easily self-hosted using Docker. You have two options for the database: use an existing MongoDB instance or self-host MongoDB alongside the application.
+
+### Quick Start (Using External MongoDB)
+
+**💡 Tip**: You can use [MongoDB](https://www.mongodb.com) which offers a free tier, perfect if you don't want to self-host MongoDB.
+
+#### 1. Create X Developer Application
+
+First, you'll need to create an X (Twitter) developer application to get your API credentials. Follow the detailed guide in the [Setting Up X (Twitter) Developer Application](#setting-up-x-twitter-developer-application) section below.
+
+#### 2. Pull the Docker Image
+
+```bash
+docker pull ghcr.io/timotme/simplytweeted:latest
+```
+
+#### 3. Create Environment File
+
+Create a `.env` file with your configuration:
+
+```bash
+# Authentication
+AUTH_SECRET=your_auth_secret_key # Generate with `openssl rand -base64 64`
+AUTH_URL=https://your-domain.com # Your public domain
+AUTH_TRUST_HOST=true
+
+# Database
+DB_ENCRYPTION_KEY=your_encryption_key_for_tokens # Generate with `openssl rand -base64 64`
+MONGODB_URI=mongodb://username:password@your-mongodb-host:27017/simplyTweeted
+
+# Twitter API
+AUTH_TWITTER_ID=your_twitter_client_id
+AUTH_TWITTER_SECRET=your_twitter_client_secret
+
+# Security
+ALLOWED_TWITTER_ACCOUNTS=your_twitter_username,another_username # Comma-separated list
+
+# Host Settings
+ORIGIN=https://your-domain.com # Full URL as seen in browser
+PORT=3000
+```
+
+#### 4. Run the Container
+
+```bash
+docker run -d \
+  --name simply-tweeted \
+  -p 3000:3000 \
+  --env-file .env \
+  ghcr.io/timotme/simplytweeted:latest
+```
+
+### Complete Self-Hosted Setup (Including MongoDB)
+
+If you want to self-host MongoDB as well, use the provided Docker Compose configuration:
+
+#### 1. Get the Docker Compose Files
+
+```bash
+# Download the docker-compose.yml and environment template
+curl https://raw.githubusercontent.com/timotme/SimplyTweeted/main/deployment/prod/self-hosted/docker-compose.yml
+```
+
+#### 2. Create Environment File
+
+Create a `.env.docker` file in the same directory:
+
+```bash
+# Authentication
+AUTH_SECRET=your_auth_secret_key # Generate with `openssl rand -base64 32`
+AUTH_URL=https://your-domain.com
+AUTH_TRUST_HOST=true
+
+# Database (for self-hosted MongoDB)
+DB_ENCRYPTION_KEY=your_encryption_key_for_tokens # Generate with `openssl rand -base64 32`
+MONGODB_URI=mongodb://root:example@mongo:27017/simplyTweeted
+
+# Twitter API
+AUTH_TWITTER_ID=your_twitter_client_id
+AUTH_TWITTER_SECRET=your_twitter_client_secret
+
+# Security
+ALLOWED_TWITTER_ACCOUNTS=your_twitter_username,another_username
+
+# Host Settings
+ORIGIN=https://your-domain.com
+PORT=3000
+```
+
+#### 3. Start the Services
+
+```bash
+docker-compose up -d
+```
+
+This will start both MongoDB and Simply Tweeted. The application will be available on port 3000, and MongoDB will be accessible on port 27018 (mapped from internal 27017).
+
+### Important Notes
+
+- **Twitter API Setup**: Make sure to configure your Twitter App's OAuth callback URL to match your domain
+- **Security**: Use strong, randomly generated secrets for `AUTH_SECRET` and `DB_ENCRYPTION_KEY`
+- **Firewall**: Only expose port 3000 to the internet; keep MongoDB port (27018) internal
+- **Backup**: Regular database backups are recommended for production use
+- **SSL**: Use a reverse proxy (like Nginx) with SSL certificates for production deployments
+
+### Production Considerations
+
+For production deployments, consider:
+- Using a reverse proxy (Nginx/Traefik) with SSL termination
+- Setting up automated backups for MongoDB
 
 ## Tech Stack
 
@@ -188,4 +302,73 @@ If you encounter any issues or have questions, please [open an issue](https://gi
 
 ---
 
-Made with ❤️ for the X community 
+Made with ❤️ by [Timothy] [https://x.com/timot_me]
+
+## Setting Up X (Twitter) Developer Application
+
+To use Simply Tweeted, you'll need to create an X (Twitter) developer application to get the required API credentials. Here's a step-by-step guide:
+
+### 1. Apply for X Developer Access
+
+1. **Visit the X Developer Portal**: Go to [developer.twitter.com](https://developer.x.com)
+2. **Sign in**: Use your X (Twitter) account credentials
+3. **Apply for Access**: Click "Apply" and select "Professional" use case
+4. **Fill out the Application**: 
+   - Describe your intended use (e.g., "Personal tweet scheduling application")
+   - Explain how you'll use the Twitter API
+   - Agree to the Developer Agreement and Policy
+
+### 2. Create a New App
+
+Once your developer account is approved:
+
+1. **Navigate to the Developer Portal**: Go to your [developer dashboard](https://developer.x.com/en/portal/dashboard)
+2. **Create a New Project**: Click "Create Project"
+3. **Project Details**:
+   - **Name**: Simply Tweeted (or your preferred name)
+   - **Use Case**: Choose "Making a bot" or "Building tools for yourself"
+   - **Environment**: Select "Development" for testing or "Production" for live use
+
+### 3. Configure Your App
+
+1. **App Settings**: Click on your newly created app
+2. **App Permissions**: 
+   - Set to **"Read and write"** (required for posting tweets)
+   - Enable **"Request email address from users"** if you want email access
+3. **Authentication Settings**:
+   - **App Type**: Set to "Web App"
+   - **Callback URLs**: Add your domain callback:
+     ```
+     https://your-domain.com/auth/callback/twitter
+     ```
+     For local development, also add:
+     ```
+     http://localhost:3000/auth/callback/twitter
+     ```
+   - **Website URL**: Add your application's URL (this is not important)
+
+### 4. Generate OAuth 2.0 Credentials
+
+Simply Tweeted uses OAuth 2.0 for authentication. You only need the OAuth 2.0 Client ID and Client Secret:
+
+1. **User Authentication Settings**: In your app settings, click "Set up" in the OAuth 2.0 section
+2. **OAuth 2.0 Settings**:
+   - **App Type**: Select "Confidential client"
+   - **Client ID**: This becomes your `AUTH_TWITTER_ID`
+   - **Client Secret**: This becomes your `AUTH_TWITTER_SECRET`
+
+**Note**: You don't need the older API Key and API Secret - Simply Tweeted only uses OAuth 2.0 credentials.
+
+### Important Notes
+
+- **Rate Limits**: Free tier has limited API calls per day/months. ~ 17 scheduled posts per 24h
+- **Security**: Keep your API keys secure and never commit them to version control
+- **Callback URLs**: Must exactly match your domain (including https/http)
+
+### Common Issues
+
+- **Callback URL Mismatch**: Ensure your `AUTH_URL` environment variable matches the callback URL in your X app
+- **Permission Denied**: Verify your app has "Read and write" permissions
+- **Invalid Credentials**: Double-check your `AUTH_TWITTER_ID` and `AUTH_TWITTER_SECRET`
+
+For more detailed information, visit the [X API documentation](https://developer.twitter.com/en/docs).
