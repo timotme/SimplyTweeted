@@ -3,6 +3,11 @@
 A clean, intuitive tweet scheduling platform that makes scheduling your X (Twitter) content effortless.
 
 
+
+https://github.com/user-attachments/assets/a221680c-684f-41ae-99dd-5b5624675ab4
+
+
+
 ## Features
 
 - **📅 Tweet Scheduling**: Plan your content in advance and let Simply Tweeted post it at the perfect time. **Support posting on communities**
