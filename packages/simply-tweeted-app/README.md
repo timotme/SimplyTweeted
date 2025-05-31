@@ -14,6 +14,7 @@ npm install
 ```
 # Auth
 AUTH_SECRET="your-auth-secret" # Generate with `openssl rand -base64 32`
+AUTH_URL="http://localhost:5173" # Base URL for authentication callbacks
 AUTH_TRUST_HOST="true" # Set to true for local development
 AUTH_TWITTER_ID="your-twitter-client-id"
 AUTH_TWITTER_SECRET="your-twitter-client-secret"
