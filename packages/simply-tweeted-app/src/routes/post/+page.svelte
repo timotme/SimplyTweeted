@@ -2,6 +2,9 @@
 	import { enhance } from '$app/forms';
 	import { onMount, onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
+	import type { PageData } from './$types';
+
+	export let data: PageData;
 
 	let tweetContent = '';
 	let scheduledDate = new Date().toISOString().split('T')[0]; // Today's date as default
@@ -132,7 +135,9 @@
 					</label>
 					<select id="community" name="community" bind:value={community} class="select select-bordered w-full">
 						<option value="">None</option>
-						<option value="build in public">Build in Public</option>
+						{#each data.availableCommunities as communityOption}
+							<option value={communityOption}>{communityOption}</option>
+						{/each}
 					</select>
 				</div>
 				

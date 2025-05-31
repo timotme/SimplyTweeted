@@ -1,5 +1,5 @@
 import { DatabaseClient } from 'shared-lib/backend';
-import { TweetStatus, Tweet, UserAccount } from 'shared-lib';
+import { TweetStatus, Tweet, UserAccount, getCommunityId } from 'shared-lib';
 import { TokenManager } from './tokenManager.js';
 import { TwitterApi } from 'twitter-api-v2';
 import { log } from './logger.js';
@@ -56,13 +56,32 @@ export class TweetProcessor {
         try {
           log.info(`Attempting to post tweet ${tweet.id} for user ${userId}`, { 
             tweetId: tweet.id,
-            userId 
+            userId,
+            community: tweet.community 
           });
-          await twitterV2Client.v2.tweet(tweet.content);
+          
+          const communityId = getCommunityId(tweet.community);
+          
+          const tweetOptions: any = {
+            text: tweet.content
+          };
+          
+          // Validate community mapping if community is specified
+          if (tweet.community && tweet.community.trim() !== '') {
+            if (!communityId) {
+              throw new Error(`No community mapping found for: ${tweet.community}`);
+            }
+            tweetOptions.community_id = communityId;
+          }
+          
+          // Post the tweet with appropriate options
+          await twitterV2Client.v2.tweet(tweetOptions);
           await this.dbClient.updateTweetStatus(tweet.id!, TweetStatus.POSTED);
           log.info(`Successfully posted tweet ${tweet.id}`, { 
             tweetId: tweet.id,
-            userId 
+            userId,
+            community: tweet.community,
+            communityId: communityId || 'none'
           });
         } catch (error) {
           log.error(`Error posting tweet ${tweet.id} for user ${userId}:`, { 
