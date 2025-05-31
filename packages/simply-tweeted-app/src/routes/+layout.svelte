@@ -4,6 +4,7 @@
 	import { signOut } from '@auth/sveltekit/client';
 
 	let { children } = $props();
+
 </script>
 
 <div class="drawer lg:drawer-open">
@@ -27,7 +28,6 @@
 							</div>
 						</div>
 						<ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
-							<li><a href="/profile">Profile</a></li>
 							<li><button on:click={() => signOut()} class="w-full text-left">Sign out</button></li>
 						</ul>
 					</div>
@@ -43,7 +43,10 @@
 
 		<footer class="footer footer-center p-4 bg-base-300 text-base-content">
 			<div>
-				<p>© 2023 Simply Tweeted - Schedule your tweets with ease</p>
+				<p>
+					Simply Tweeted - Powered by the community, for the community |
+					<a href="https://github.com/timotme/SimplyTweeted" target="_blank" rel="noopener noreferrer" class="link link-primary">GitHub</a>
+				</p>
 			</div>
 		</footer>
 	</div>
@@ -121,7 +124,7 @@
 								{$page.data.session.user?.name || 'User'}
 							</div>
 							<div class="text-sm text-base-content/70">
-								@{$page.data.session.user?.email?.split('@')[0] || 'username'}
+								@{($page.data.session.user as any)?.username || 'username'}
 							</div>
 						</div>
 					</div>
